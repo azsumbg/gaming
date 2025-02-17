@@ -374,11 +374,13 @@ dll::CREATURES::CREATURES(uint8_t what, float init_x, float init_y) :BASE(what, 
 	case evil2:
 		lifes = 25;
 		strenght = 8;
+		attack_delay = 180;
 		break;
 
 	case evil3:
 		lifes = 35;
 		strenght = 10;
+		attack_delay = 200;
 		break;
 
 	case hero:
@@ -392,7 +394,82 @@ bool AIShoot(cont::CONTAINER<FPOINT> civs, FPOINT Hero_pos, FPOINT& where_to_sho
 
 bool dll::CREATURES::Move(float gear)
 {
+	float my_speed = speed + gear / 5.0f;
+	
+	if (type == hero)
+	{
+		switch (dir)
+		{
+		case dirs::left:
+			if (start.x - my_speed >= 0)
+			{
+				start.x -= my_speed;
+				SetEdges();
+			}
+			break;
 
+		case dirs::right:
+			if (end.x + my_speed <= scr_width)
+			{
+				start.x += my_speed;
+				SetEdges();
+			}
+			break;
+
+		case dirs::up:
+			if (start.y - my_speed >= sky)
+			{
+				start.y -= my_speed;
+				SetEdges();
+			}
+			break;
+
+		case dirs::down:
+			if (end.y + my_speed <= ground)
+			{
+				start.y += my_speed;
+				SetEdges();
+			}
+			break;
+		}
+
+		return true;
+	}
+	else
+	{
+		switch (dir)
+		{
+		case dirs::left:
+			if (start.x - my_speed > 0)
+			{
+				start.x -= my_speed;
+				SetEdges();
+				return true;
+			}
+			else
+			{
+				dir = dirs::right;
+				return false;
+			}
+			break;
+
+		case dirs::right:
+			if (end.x + my_speed < scr_width)
+			{
+				start.x += my_speed;
+				SetEdges();
+				return true;
+			}
+			else
+			{
+				dir = dirs::left;
+				return false;
+			}
+			break;
+		}
+	}
+
+	return false;
 }
 void dll::CREATURES::Release()
 {
