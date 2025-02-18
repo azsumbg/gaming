@@ -390,7 +390,76 @@ dll::CREATURES::CREATURES(uint8_t what, float init_x, float init_y) :BASE(what, 
 	}
 }
 
-bool AIShoot(cont::CONTAINER<FPOINT> civs, FPOINT Hero_pos, FPOINT& where_to_shoot);
+float dll::CREATURES::Distance(FPOINT myPoint, FPOINT refPoint)
+{
+	float a = static_cast<float>(pow(abs(myPoint.x - refPoint.x), 2));
+	float b = static_cast<float>(pow(abs(myPoint.y - refPoint.y), 2));
+
+	return static_cast<float>(sqrt(a + b));
+}
+
+FPOINT dll::CREATURES::Sort(cont::CONTAINER<FPOINT> refContainer)
+{
+	if (refContainer.size() <= 1)return refContainer[0];
+
+	bool ready = false;
+
+	while (!ready)
+	{
+		ready = true;
+		for (int i = 0; i < refContainer.size() - 1; ++i)
+		{
+			if (Distance(start, refContainer[i]) > Distance(start, refContainer[i + 1]))
+			{
+				FPOINT temp = refContainer[i];
+				refContainer[i] = refContainer[i + 1];
+				refContainer[i + 1] = temp;
+				ready = false;
+			}
+		}
+	}
+
+	return refContainer[0];
+}
+
+bool dll::CREATURES::AIShoot(cont::CONTAINER<FPOINT> civs, FPOINT Hero_pos, FPOINT where_to_shoot)
+{
+	if (Distance(start, Hero_pos) <= 100.0f)
+	{
+		dir = dirs::stop;
+
+		--attack_delay;
+		if (attack_delay <= 0)
+		{
+			switch (type)
+			{
+			case evil1:
+				attack_delay = 150;
+				break;
+
+			case evil2:
+				attack_delay = 180;
+				break;
+
+			case evil3:
+				attack_delay = 200;
+				break;
+			}
+		
+			return true;
+		}
+
+		return false;
+	}
+
+	FPOINT next_target = Sort(civs);
+
+	if (next_target.x < start.x)dir = dirs::left;
+	else if (next_target.x > start.x)dir = dirs::right;
+	else dir = dirs::stop;
+
+	return false;
+}
 
 bool dll::CREATURES::Move(float gear)
 {

@@ -136,7 +136,11 @@ namespace dll
 		int strenght = 0;
 		int lifes = 0;
 
-		bool AIShoot(cont::CONTAINER<FPOINT> civs, FPOINT Hero_pos, FPOINT& where_to_shoot);
+		float Distance(FPOINT myPoint, FPOINT refPoint);
+
+		FPOINT Sort(cont::CONTAINER<FPOINT> refContainer);
+
+		bool AIShoot(cont::CONTAINER<FPOINT> civs, FPOINT Hero_pos, FPOINT where_to_shoot);
 		
 		friend GAMING_API CREATURES* CreatureFactory(uint8_t which_object, float deploy_x, float deploy_y);
 
